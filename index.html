@@ -66,10 +66,10 @@
         </div>
       </div>
 
-      <!-- CARDS DE SALDO E GASTOS AJUSTADOS -->
+      <!-- CARDS DE SALDO E GASTOS -->
       <div class="grid grid-cols-2 gap-2.5">
         
-        <!-- CARD 1: SALDO LÍQUIDO GERAL + JOYCE & RODRIGO -->
+        <!-- CARD 1: SALDO LÍQUIDO -->
         <div id="balance-card" class="col-span-2 bg-emerald-600 text-white rounded-2xl p-4 shadow-lg transition-colors space-y-3">
           <div class="flex justify-between items-center opacity-90 text-xs font-semibold uppercase tracking-wider">
             <span>Saldo Líquido em Conta (Caixa)</span>
@@ -80,7 +80,6 @@
             <div class="text-[11px] text-emerald-100 font-medium mt-0.5" id="kpi-balance-status">Entradas menos saídas reais 🎉</div>
           </div>
 
-          <!-- Divisão Saldo Joyce vs Rodrigo -->
           <div class="grid grid-cols-2 gap-2 pt-2 border-t border-emerald-500/50">
             <div class="bg-black/15 rounded-xl p-2 flex items-center justify-between">
               <span class="text-[11px] text-emerald-100 font-medium">Joyce:</span>
@@ -93,7 +92,7 @@
           </div>
         </div>
 
-        <!-- CARD 2: ENTRADAS TOTAL + JOYCE & RODRIGO -->
+        <!-- CARD 2: ENTRADAS -->
         <div class="col-span-2 bg-white rounded-2xl p-3.5 border border-slate-200 shadow-sm space-y-2.5">
           <div class="flex items-center justify-between">
             <div class="flex items-center gap-1.5 text-emerald-600 font-bold text-xs">
@@ -116,7 +115,7 @@
           </div>
         </div>
 
-        <!-- CARD 3: À VISTA (PIX / DÉBITO) + JOYCE & RODRIGO -->
+        <!-- CARD 3: À VISTA -->
         <div class="col-span-2 bg-white rounded-2xl p-3.5 border border-slate-200 shadow-sm space-y-2.5">
           <div class="flex items-center justify-between">
             <div class="flex items-center gap-1.5 text-amber-600 font-bold text-xs">
@@ -139,7 +138,7 @@
           </div>
         </div>
 
-        <!-- CARD 4: FATURA DO CARTÃO DE CRÉDITO (MANTIDO) -->
+        <!-- CARD 4: FATURA CARTÃO -->
         <div class="col-span-2 bg-gradient-to-br from-slate-900 to-indigo-950 text-white rounded-2xl p-4 shadow-md space-y-3">
           <div class="flex items-center justify-between">
             <div class="flex items-center gap-2">
@@ -183,19 +182,29 @@
           <span class="text-xs font-bold text-slate-700 flex items-center gap-1.5">
             <i class="ph-bold ph-funnel text-indigo-600"></i> Filtros de Consulta
           </span>
-          <button onclick="resetFilters()" class="text-[11px] font-semibold text-indigo-600 hover:underline">Limpar</button>
+          <button onclick="resetFilters()" class="text-[11px] font-semibold text-indigo-600 hover:underline">Limpar filtros</button>
         </div>
 
+        <!-- Tipo -->
         <div class="flex gap-2">
           <button onclick="setFilter('type', 'all')" id="filter-type-all" class="filter-type-btn flex-1 py-1.5 text-xs font-semibold rounded-xl border border-indigo-600 bg-indigo-600 text-white transition">Tudo</button>
           <button onclick="setFilter('type', 'Despesa')" id="filter-type-Despesa" class="filter-type-btn flex-1 py-1.5 text-xs font-semibold rounded-xl border border-slate-200 bg-slate-50 text-slate-700 transition">Gastos</button>
           <button onclick="setFilter('type', 'Receita')" id="filter-type-Receita" class="filter-type-btn flex-1 py-1.5 text-xs font-semibold rounded-xl border border-slate-200 bg-slate-50 text-slate-700 transition">Entradas</button>
         </div>
 
+        <!-- Pessoa -->
         <div class="flex gap-2">
           <button onclick="setFilter('person', 'all')" id="filter-person-all" class="filter-person-btn flex-1 py-1 text-xs font-bold rounded-xl border border-indigo-600 bg-indigo-600 text-white">Todos</button>
           <button onclick="setFilter('person', 'Joyce')" id="filter-person-Joyce" class="filter-person-btn flex-1 py-1 text-xs font-medium rounded-xl border border-slate-200 bg-white text-slate-600">Joyce</button>
           <button onclick="setFilter('person', 'Rodrigo')" id="filter-person-Rodrigo" class="filter-person-btn flex-1 py-1 text-xs font-medium rounded-xl border border-slate-200 bg-white text-slate-600">Rodrigo</button>
+        </div>
+
+        <!-- Categoria Dinâmica -->
+        <div>
+          <label class="block text-[10px] text-slate-500 font-bold mb-1 uppercase tracking-wider">Filtrar por Categoria Específica:</label>
+          <select id="filter-category-select" onchange="setCategoryFilter(this.value)" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-semibold text-slate-700 focus:outline-none focus:border-indigo-600">
+            <option value="all">Todas as categorias</option>
+          </select>
         </div>
       </div>
 
@@ -205,9 +214,8 @@
           <h3 class="text-xs font-bold text-slate-700 flex items-center gap-1.5" id="chart-section-title">
             <i class="ph-bold ph-chart-pie-slice text-indigo-600"></i> Distribuição por Categoria
           </h3>
-          <!-- Total consolidado do filtro ativo -->
           <div class="text-right">
-            <span class="text-[10px] text-slate-400 font-semibold block leading-tight">Total Filtrado</span>
+            <span class="text-[10px] text-slate-400 font-semibold block leading-tight" id="chart-filter-label">Total Filtrado</span>
             <span class="text-sm font-black text-indigo-600" id="chart-filter-total">R$ 0,00</span>
           </div>
         </div>
@@ -215,6 +223,7 @@
         <div class="relative h-44 w-full flex items-center justify-center">
           <canvas id="categoryChart"></canvas>
         </div>
+        <p class="text-[10px] text-center text-slate-400">💡 Toque em qualquer fatia ou legenda do gráfico para filtrar diretamente</p>
       </div>
 
       <!-- HISTÓRICO -->
@@ -435,7 +444,7 @@
   </div>
 
   <script>
-    const STORAGE_KEY = 'joyce_rodrigo_financas_v12';
+    const STORAGE_KEY = 'joyce_rodrigo_financas_v13';
     const CONFIG_KEY = 'casal_financas_cloud_url';
     const CARD_CLOSING_DAY = 5;
 
@@ -443,7 +452,7 @@
     let isViewAllMonths = true;
     let cloudUrl = localStorage.getItem(CONFIG_KEY) || 'https://script.google.com/macros/s/AKfycbxfa2KopzAig7CLB3FXxKhkFQTZoaojT8yx65JWwCuP8syrxxnX2xHp1c1XBYumkLC2kg/exec';
     let transactions = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
-    let currentFilter = { type: 'all', person: 'all' };
+    let currentFilter = { type: 'all', person: 'all', category: 'all' };
     let wizardData = { type: 'Despesa', person: '', date: '', amount: 0, payment: '', category: '', desc: '' };
     let chartInstance = null;
 
@@ -666,6 +675,7 @@
     function setFilter(filterType, val) {
       if (filterType === 'type') {
         currentFilter.type = val;
+        currentFilter.category = 'all'; // Reseta categoria ao trocar tipo
         ['all', 'Despesa', 'Receita'].forEach(t => {
           const b = document.getElementById(`filter-type-${t}`);
           b.className = t === val ? 'filter-type-btn flex-1 py-1.5 text-xs font-semibold rounded-xl border border-indigo-600 bg-indigo-600 text-white transition' : 'filter-type-btn flex-1 py-1.5 text-xs font-semibold rounded-xl border border-slate-200 bg-slate-50 text-slate-700 transition';
@@ -681,7 +691,17 @@
       renderApp();
     }
 
-    function resetFilters() { setFilter('type', 'all'); setFilter('person', 'all'); }
+    function setCategoryFilter(catVal) {
+      currentFilter.category = catVal;
+      renderApp();
+    }
+
+    function resetFilters() {
+      currentFilter = { type: 'all', person: 'all', category: 'all' };
+      setFilter('type', 'all');
+      setFilter('person', 'all');
+      document.getElementById('filter-category-select').value = 'all';
+    }
 
     function deleteItem(id) {
       if (confirm('Deseja excluir este lançamento?')) {
@@ -703,6 +723,7 @@
       let totalPurchasedInMonth = 0;
       
       const dynamicCategoryMap = {};
+      const allAvailableCategories = new Set();
       const nextMonthIdx = selMonth === 11 ? 0 : selMonth + 1;
       const nextYearIdx = selMonth === 11 ? selYear + 1 : selYear;
 
@@ -714,6 +735,13 @@
         const isCredit = (t.payment.toLowerCase().includes('crédito') || t.payment.toLowerCase().includes('credito'));
         const isJoyce = t.person.toLowerCase().includes('joyce');
 
+        // Coleta categorias para o dropdown de filtro
+        if (matchMonth) {
+          if (currentFilter.type === 'Receita' && isIncome) allAvailableCategories.add(t.category || 'Outros');
+          else if (currentFilter.type === 'Despesa' && !isIncome) allAvailableCategories.add(t.category || 'Outros');
+          else if (currentFilter.type === 'all') allAvailableCategories.add(t.category || 'Outros');
+        }
+
         // 1. ENTRADAS
         if (isIncome && matchMonth) {
           totalIncome += t.amount;
@@ -722,7 +750,7 @@
           else incomeRodrigo += t.amount;
         }
 
-        // 2. SAÍDAS À VISTA (PIX / DÉBITO / DINHEIRO)
+        // 2. SAÍDAS À VISTA
         if (!isIncome && matchMonth) {
           totalPurchasedInMonth += t.amount;
           if (!isCredit) {
@@ -733,7 +761,7 @@
           }
         }
 
-        // 3. FATURA DO CARTÃO DE CRÉDITO
+        // 3. FATURA DO CARTÃO
         if (!isIncome && isCredit) {
           const due = getInvoiceDueMonth(t.date);
           if (isViewAllMonths) {
@@ -750,12 +778,23 @@
         }
       });
 
-      // CÁLCULO DE SALDO LÍQUIDO (ENTRADAS - SAÍDAS À VISTA)
+      // Atualiza opções do dropdown de categoria
+      const catSelect = document.getElementById('filter-category-select');
+      const currentVal = currentFilter.category;
+      catSelect.innerHTML = '<option value="all">Todas as categorias</option>' + 
+        Array.from(allAvailableCategories).sort().map(c => `<option value="${c}">${c}</option>`).join('');
+      if (Array.from(allAvailableCategories).includes(currentVal) || currentVal === 'all') {
+        catSelect.value = currentVal;
+      } else {
+        catSelect.value = 'all';
+        currentFilter.category = 'all';
+      }
+
+      // CARDS FIXOS
       const realCashBalance = totalIncome - directExpense;
       const balanceJoyce = incomeJoyce - directJoyce;
       const balanceRodrigo = incomeRodrigo - directRodrigo;
 
-      // ATUALIZAÇÃO DOS CARDS
       document.getElementById('kpi-balance').innerText = formatCurrency(realCashBalance);
       document.getElementById('kpi-balance-joyce').innerText = formatCurrency(balanceJoyce);
       document.getElementById('kpi-balance-rodrigo').innerText = formatCurrency(balanceRodrigo);
@@ -788,7 +827,7 @@
         balStatus.innerText = 'Atenção: Saídas superaram as entradas ⚠️';
       }
 
-      // FILTRAGEM PARA O GRÁFICO E HISTÓRICO
+      // FILTRAGEM DINÂMICA (TIPO + PESSOA + CATEGORIA ESPECÍFICA)
       let filterTotalAmount = 0;
       const filteredList = transactions.filter(t => {
         const p = parseDateObj(t.date);
@@ -801,6 +840,10 @@
         if (currentFilter.type === 'Despesa' && isIncome) return false;
 
         if (currentFilter.person !== 'all' && !t.person.toLowerCase().includes(currentFilter.person.toLowerCase())) return false;
+        
+        // Filtro estrito de Categoria
+        if (currentFilter.category !== 'all' && (t.category || 'Outros').toLowerCase() !== currentFilter.category.toLowerCase()) return false;
+
         return true;
       });
 
@@ -810,14 +853,21 @@
         filterTotalAmount += t.amount;
       });
 
-      // Total consolidado do filtro aplicado
+      // ATUALIZAÇÃO DO TOTAL DINÂMICO NO TOPO DO GRÁFICO
       document.getElementById('chart-filter-total').innerText = formatCurrency(filterTotalAmount);
+      
+      const chartLabel = document.getElementById('chart-filter-label');
+      if (currentFilter.category !== 'all') {
+        chartLabel.innerText = `Total: ${currentFilter.category}`;
+      } else {
+        chartLabel.innerText = 'Total Filtrado';
+      }
 
       document.getElementById('history-badge').innerText = `${filteredList.length} itens`;
       const listEl = document.getElementById('transactions-list');
 
       if (filteredList.length === 0) {
-        listEl.innerHTML = `<div class="text-center py-8 text-slate-400 text-xs"><i class="ph-bold ph-receipt text-3xl mb-1 block"></i>Nenhum registro encontrado para os filtros selecionados.</div>`;
+        listEl.innerHTML = `<div class="text-center py-8 text-slate-400 text-xs"><i class="ph-bold ph-receipt text-3xl mb-1 block"></i>Nenhum registro encontrado para este filtro.</div>`;
       } else {
         listEl.innerHTML = filteredList.map(t => {
           const isIncome = (t.type.toLowerCase().includes('receita') || t.type.toLowerCase().includes('entrada'));
@@ -902,7 +952,32 @@
         options: {
           responsive: true,
           maintainAspectRatio: false,
-          plugins: { legend: { position: 'right', labels: { boxWidth: 10, font: { size: 10 } } } },
+          onClick: (evt, elements) => {
+            if (elements && elements.length > 0) {
+              const clickedIndex = elements[0].index;
+              const selectedCategory = labels[clickedIndex];
+              // Alterna seleção da categoria ao clicar na fatia
+              if (currentFilter.category === selectedCategory) {
+                setCategoryFilter('all');
+              } else {
+                setCategoryFilter(selectedCategory);
+              }
+            }
+          },
+          plugins: { 
+            legend: { 
+              position: 'right', 
+              labels: { boxWidth: 10, font: { size: 10 } },
+              onClick: (evt, legendItem) => {
+                const selectedCategory = legendItem.text;
+                if (currentFilter.category === selectedCategory) {
+                  setCategoryFilter('all');
+                } else {
+                  setCategoryFilter(selectedCategory);
+                }
+              }
+            } 
+          },
           cutout: '68%'
         }
       });

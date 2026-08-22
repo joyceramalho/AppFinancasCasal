@@ -13,7 +13,11 @@
   </style>
 </head>
 <body class="bg-slate-100 text-slate-800 min-h-screen flex flex-col justify-between antialiased selection:bg-indigo-500 selection:text-white">
+
+  <!-- MAIN WRAPPER -->
   <div class="w-full max-w-md mx-auto bg-slate-50 min-h-screen flex flex-col shadow-2xl relative pb-28">
+    
+    <!-- TOP HEADER -->
     <header class="bg-indigo-600 text-white px-5 py-3.5 flex items-center justify-between sticky top-0 z-30 shadow-md">
       <div class="flex items-center space-x-2.5">
         <div class="w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center backdrop-blur-sm">
@@ -27,6 +31,7 @@
           </div>
         </div>
       </div>
+      
       <div class="flex items-center space-x-1.5">
         <button onclick="fetchFromCloud(true)" title="Sincronizar com Planilha" class="p-2 rounded-lg bg-indigo-500 hover:bg-indigo-400 text-white btn-press transition">
           <i class="ph ph-arrows-clockwise text-lg" id="sync-icon"></i>
@@ -37,13 +42,16 @@
       </div>
     </header>
 
+    <!-- DASHBOARD -->
     <main class="flex-1 p-4 space-y-4">
+      
+      <!-- MONTH SELECTOR -->
       <div class="bg-white rounded-2xl p-3 border border-slate-200 shadow-sm flex items-center justify-between">
         <button onclick="changeMonth(-1)" class="p-1.5 text-slate-600 hover:text-indigo-600 rounded-lg">
           <i class="ph-bold ph-caret-left text-lg"></i>
         </button>
         <div class="text-center">
-          <span class="text-xs font-bold text-slate-800 uppercase tracking-wide" id="selected-month-label">Agosto 2026</span>
+          <span class="text-xs font-bold text-slate-800 uppercase tracking-wide" id="selected-month-label">Carregando...</span>
           <p class="text-[10px] text-slate-400 font-medium">Fechamento do Cartão: Todo dia 05</p>
         </div>
         <button onclick="changeMonth(1)" class="p-1.5 text-slate-600 hover:text-indigo-600 rounded-lg">
@@ -51,7 +59,10 @@
         </button>
       </div>
 
+      <!-- BALANCE OVERVIEW CARDS -->
       <div class="grid grid-cols-2 gap-2.5">
+        
+        <!-- Saldo Líquido do Mês -->
         <div id="balance-card" class="col-span-2 bg-emerald-600 text-white rounded-2xl p-4 shadow-lg transition-colors">
           <div class="flex justify-between items-center opacity-85 text-xs font-semibold uppercase tracking-wider mb-1">
             <span id="balance-card-title">Saldo Líquido em Conta (Caixa)</span>
@@ -61,6 +72,7 @@
           <div class="text-[11px] text-emerald-100 font-medium mt-1" id="kpi-balance-status">Entradas menos saídas reais do mês 🎉</div>
         </div>
 
+        <!-- Total Entradas do Mês -->
         <div class="bg-white rounded-2xl p-3.5 border border-slate-200 shadow-sm flex flex-col justify-between">
           <div class="flex items-center justify-between text-emerald-600 font-bold text-xs mb-1">
             <span class="flex items-center gap-1"><i class="ph-bold ph-arrow-down-left"></i> Entradas</span>
@@ -69,6 +81,7 @@
           <span class="text-[10px] text-slate-400 mt-1" id="kpi-income-count">0 receitas</span>
         </div>
 
+        <!-- Fatura Paga no Mês -->
         <div class="bg-white rounded-2xl p-3.5 border border-slate-200 shadow-sm flex flex-col justify-between">
           <div class="flex items-center justify-between text-indigo-600 font-bold text-xs mb-1">
             <span class="flex items-center gap-1"><i class="ph-bold ph-receipt"></i> Fatura Paga</span>
@@ -77,6 +90,7 @@
           <span class="text-[10px] text-slate-400 mt-1" id="kpi-invoice-due-desc">Venceu no dia 05</span>
         </div>
 
+        <!-- Gastos Diretos (Pix / Débito / Dinheiro) -->
         <div class="bg-white rounded-2xl p-3 border border-slate-200 shadow-sm flex items-center justify-between">
           <div>
             <div class="text-[10px] text-slate-400 font-medium">À Vista (Pix / Débito)</div>
@@ -85,6 +99,7 @@
           <div class="w-7 h-7 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center font-bold text-xs"><i class="ph-bold ph-lightning"></i></div>
         </div>
 
+        <!-- Total Comprado no Mês -->
         <div class="bg-white rounded-2xl p-3 border border-slate-200 shadow-sm flex items-center justify-between">
           <div>
             <div class="text-[10px] text-slate-400 font-medium">Total Comprado no Mês</div>
@@ -93,6 +108,7 @@
           <div class="w-7 h-7 rounded-lg bg-rose-50 text-rose-500 flex items-center justify-center font-bold text-xs"><i class="ph-bold ph-shopping-bag"></i></div>
         </div>
 
+        <!-- FATURA ACUMULADA PARA O PRÓXIMO MÊS -->
         <div class="col-span-2 bg-gradient-to-br from-slate-900 to-indigo-950 text-white rounded-2xl p-4 shadow-md space-y-3">
           <div class="flex items-center justify-between">
             <div class="flex items-center gap-2">
@@ -109,6 +125,7 @@
             </div>
           </div>
 
+          <!-- Divisão da Fatura Joyce vs Rodrigo -->
           <div class="grid grid-cols-2 gap-2 pt-2 border-t border-slate-800">
             <div class="bg-slate-800/60 rounded-xl p-2.5 flex items-center justify-between">
               <div class="flex items-center gap-2">
@@ -117,6 +134,7 @@
               </div>
               <span class="text-xs font-bold text-rose-300" id="kpi-next-inv-joyce">R$ 0,00</span>
             </div>
+
             <div class="bg-slate-800/60 rounded-xl p-2.5 flex items-center justify-between">
               <div class="flex items-center gap-2">
                 <div class="w-6 h-6 rounded-md bg-sky-500 text-white flex items-center justify-center text-[10px] font-bold">ROD</div>
@@ -126,8 +144,10 @@
             </div>
           </div>
         </div>
+
       </div>
 
+      <!-- FILTERS -->
       <div class="bg-white rounded-2xl p-3.5 border border-slate-200 shadow-sm space-y-3">
         <div class="flex items-center justify-between">
           <span class="text-xs font-bold text-slate-700 flex items-center gap-1.5">
@@ -149,6 +169,7 @@
         </div>
       </div>
 
+      <!-- CHART SECTION -->
       <div class="bg-white rounded-2xl p-4 border border-slate-200 shadow-sm">
         <h3 class="text-xs font-bold text-slate-700 mb-3 flex items-center gap-1.5" id="chart-section-title">
           <i class="ph-bold ph-chart-pie-slice text-indigo-600"></i> Distribuição por Categoria
@@ -158,17 +179,21 @@
         </div>
       </div>
 
+      <!-- TRANSACTION HISTORY -->
       <div class="bg-white rounded-2xl p-4 border border-slate-200 shadow-sm space-y-3">
         <div class="flex items-center justify-between">
           <h3 class="text-xs font-bold text-slate-700 flex items-center gap-1.5">
-            <i class="ph-bold ph-clock-counter-clockwise text-indigo-600"></i> Histórico do Mês
+            <i class="ph-bold ph-clock-counter-clockwise text-indigo-600"></i> Histórico de Lançamentos
           </h3>
           <span class="text-[11px] text-slate-400 font-medium" id="history-badge">0 itens</span>
         </div>
+
         <div id="transactions-list" class="space-y-2.5"></div>
       </div>
+
     </main>
 
+    <!-- BOTTOM BAR -->
     <div class="fixed bottom-0 left-0 right-0 max-w-md mx-auto p-3 bg-white/95 backdrop-blur-md border-t border-slate-200 grid grid-cols-2 gap-2.5 z-40">
       <button onclick="openWizard('Receita')" class="btn-press py-3 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-md transition">
         <i class="ph-bold ph-plus-circle text-base"></i> + Entrada
@@ -178,6 +203,7 @@
       </button>
     </div>
 
+    <!-- WIZARD -->
     <div id="view-wizard" class="hidden fixed inset-0 z-50 bg-white max-w-md mx-auto flex flex-col justify-between">
       <div class="px-5 py-4 border-b border-slate-100 flex items-center justify-between">
         <button onclick="closeWizard()" class="p-2 text-slate-400 hover:text-slate-700 rounded-full">
@@ -197,6 +223,7 @@
       </div>
 
       <div class="flex-1 p-6 flex flex-col justify-center">
+        <!-- Passo 1 -->
         <div id="step-1" class="wizard-step space-y-6">
           <div class="text-center">
             <span id="wizard-flow-badge" class="px-3 py-1 rounded-full text-[11px] font-bold uppercase tracking-wider bg-rose-100 text-rose-700 inline-block mb-2">Novo Gasto</span>
@@ -218,6 +245,7 @@
           </div>
         </div>
 
+        <!-- Passo 2 -->
         <div id="step-2" class="wizard-step hidden space-y-6">
           <div class="text-center">
             <h2 class="text-xl font-bold text-slate-800">Qual é a data?</h2>
@@ -232,6 +260,7 @@
           </div>
         </div>
 
+        <!-- Passo 3 -->
         <div id="step-3" class="wizard-step hidden space-y-6">
           <div class="text-center">
             <h2 class="text-xl font-bold text-slate-800" id="step-3-title">Qual foi o valor?</h2>
@@ -250,6 +279,7 @@
           </div>
         </div>
 
+        <!-- Passo 4 -->
         <div id="step-4" class="wizard-step hidden space-y-6">
           <div class="text-center">
             <h2 class="text-xl font-bold text-slate-800" id="step-4-title">Forma de Pagamento</h2>
@@ -280,6 +310,7 @@
           <button onclick="goToStep(3)" class="w-full py-3 rounded-xl border border-slate-300 font-semibold text-slate-600 text-sm">Voltar</button>
         </div>
 
+        <!-- Passo 5 -->
         <div id="step-5" class="wizard-step hidden space-y-5">
           <div class="text-center">
             <h2 class="text-xl font-bold text-slate-800">Selecione a Categoria</h2>
@@ -343,6 +374,7 @@
       </div>
     </div>
 
+    <!-- MODAL CONFIG -->
     <div id="modal-config" class="hidden fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
       <div class="bg-white w-full max-w-sm rounded-3xl p-6 shadow-2xl space-y-4">
         <div class="flex items-center justify-between">
@@ -366,12 +398,12 @@
   </div>
 
   <script>
-    const STORAGE_KEY = 'joyce_rodrigo_financas_v5';
+    const STORAGE_KEY = 'joyce_rodrigo_financas_v6';
     const CONFIG_KEY = 'casal_financas_cloud_url';
     const CARD_CLOSING_DAY = 5;
 
     let currentSelectedDate = new Date();
-    let cloudUrl = localStorage.getItem(CONFIG_KEY) || '';
+    let cloudUrl = localStorage.getItem(CONFIG_KEY) || 'https://script.google.com/macros/s/AKfycbxfa2KopzAig7CLB3FXxKhkFQTZoaojT8yx65JWwCuP8syrxxnX2xHp1c1XBYumkLC2kg/exec';
     let transactions = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
     let currentFilter = { type: 'all', person: 'all' };
     let wizardData = { type: 'Despesa', person: '', date: '', amount: 0, payment: '', category: '', desc: '' };
@@ -380,17 +412,32 @@
     function saveLocal() { localStorage.setItem(STORAGE_KEY, JSON.stringify(transactions)); }
     function formatCurrency(val) { return Number(val || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }); }
 
+    /**
+     * Parse flexível e tolerante para qualquer formato de data
+     */
     function parseDateObj(dateInput) {
       if (!dateInput) return null;
       if (typeof dateInput === 'string') {
         const cleanStr = dateInput.trim();
+        // Caso YYYY-MM-DD ou ISO
         if (cleanStr.includes('-')) {
           const parts = cleanStr.split('T')[0].split('-');
-          if (parts.length === 3) return { year: parseInt(parts[0], 10), month: parseInt(parts[1], 10) - 1, day: parseInt(parts[2], 10) };
+          if (parts.length === 3) {
+            const y = parseInt(parts[0], 10);
+            const m = parseInt(parts[1], 10) - 1;
+            const d = parseInt(parts[2], 10);
+            if (!isNaN(y) && !isNaN(m) && !isNaN(d)) return { year: y, month: m, day: d };
+          }
         }
+        // Caso DD/MM/YYYY
         if (cleanStr.includes('/')) {
           const parts = cleanStr.split('/');
-          if (parts.length === 3) return { year: parseInt(parts[2], 10), month: parseInt(parts[1], 10) - 1, day: parseInt(parts[0], 10) };
+          if (parts.length === 3) {
+            const d = parseInt(parts[0], 10);
+            const m = parseInt(parts[1], 10) - 1;
+            const y = parseInt(parts[2], 10);
+            if (!isNaN(y) && !isNaN(m) && !isNaN(d)) return { year: y, month: m, day: d };
+          }
         }
       }
       const d = new Date(dateInput);
@@ -400,7 +447,7 @@
 
     function formatDateDisplay(dateInput) {
       const p = parseDateObj(dateInput);
-      if (!p) return '';
+      if (!p) return String(dateInput || '');
       return `${String(p.day).padStart(2, '0')}/${String(p.month + 1).padStart(2, '0')}/${p.year}`;
     }
 
@@ -534,7 +581,7 @@
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ action: 'add', data: item })
         });
-      } catch (err) { console.error('Erro ao enviar para nuvem:', err); }
+      } catch (err) { console.error('Erro ao enviar:', err); }
     }
 
     async function fetchFromCloud(showToast = false) {
@@ -545,24 +592,40 @@
       try {
         const res = await fetch(cloudUrl);
         const data = await res.json();
+
         if (Array.isArray(data)) {
-          transactions = data.map(item => ({
-            id: String(item.id || Date.now() + Math.random()),
-            type: String(item.type || 'Despesa'),
-            person: String(item.person || 'Joyce'),
-            date: String(item.date).split('T')[0],
-            amount: Number(item.amount) || 0,
-            payment: String(item.payment || 'Pix'),
-            category: String(item.category || 'Outros'),
-            desc: String(item.desc || '')
-          }));
+          transactions = data.map((item, idx) => {
+            const cleanType = String(item.type || 'Despesa').trim();
+            const cleanPerson = String(item.person || 'Joyce').trim();
+            const cleanCategory = String(item.category || 'Outros').trim();
+            const cleanPayment = String(item.payment || 'Pix').trim();
+            const cleanDesc = String(item.desc || '').trim();
+            const cleanAmount = Number(item.amount) || 0;
+
+            let cleanDate = item.date;
+            if (typeof cleanDate === 'string' && cleanDate.includes('T')) {
+              cleanDate = cleanDate.split('T')[0];
+            }
+
+            return {
+              id: String(item.id || Date.now() + idx),
+              type: cleanType,
+              person: cleanPerson,
+              date: cleanDate,
+              amount: cleanAmount,
+              payment: cleanPayment,
+              category: cleanCategory,
+              desc: cleanDesc
+            };
+          });
+
           saveLocal();
           renderApp();
-          if (showToast) alert('Dados sincronizados com sucesso!');
+          if (showToast) alert(`Sucesso! ${transactions.length} lançamentos carregados da planilha.`);
         }
       } catch (err) {
-        console.error('Erro:', err);
-        if (showToast) alert('Não foi possível carregar os dados. Verifique o script da planilha.');
+        console.error('Erro na sincronização:', err);
+        if (showToast) alert('Não foi possível conectar à planilha. Verifique sua conexão ou a URL.');
       } finally {
         if (icon) icon.classList.remove('animate-spin');
       }
@@ -614,37 +677,50 @@
         const p = parseDateObj(t.date);
         if (!p) return;
 
-        if (t.type === 'Receita' && p.year === selYear && p.month === selMonth) {
-          totalIncome += t.amount;
-          countIncome++;
+        // Entradas do mês selecionado
+        if (t.type.toLowerCase() === 'receita' || t.type.toLowerCase() === 'entrada') {
+          if (p.year === selYear && p.month === selMonth) {
+            totalIncome += t.amount;
+            countIncome++;
+          }
         }
 
-        if (t.type === 'Despesa') {
+        // Despesas
+        if (t.type.toLowerCase() === 'despesa' || t.type.toLowerCase() === 'gasto' || t.type.toLowerCase() === 'saida') {
           if (p.year === selYear && p.month === selMonth) {
             totalPurchasedInMonth += t.amount;
-            if (t.payment !== 'Crédito') directExpense += t.amount;
+            if (t.payment.toLowerCase() !== 'crédito' && t.payment.toLowerCase() !== 'credito') {
+              directExpense += t.amount;
+            }
           }
-          if (t.payment === 'Crédito') {
+          if (t.payment.toLowerCase() === 'crédito' || t.payment.toLowerCase() === 'credito') {
             const due = getInvoiceDueMonth(t.date);
             if (due.year === selYear && due.month === selMonth) invoiceDueInMonth += t.amount;
             if (due.year === nextYearIdx && due.month === nextMonthIdx) {
               nextInvoiceTotal += t.amount;
-              if (t.person === 'Joyce') nextInvJoyce += t.amount;
-              if (t.person === 'Rodrigo') nextInvRodrigo += t.amount;
+              if (t.person.toLowerCase() === 'joyce') nextInvJoyce += t.amount;
+              if (t.person.toLowerCase() === 'rodrigo') nextInvRodrigo += t.amount;
             }
           }
         }
       });
 
+      // Filtragem por Tipo e Pessoa para a Lista e Gráfico
       const filteredList = transactions.filter(t => {
         const p = parseDateObj(t.date);
         if (!p || p.year !== selYear || p.month !== selMonth) return false;
-        if (currentFilter.type !== 'all' && t.type !== currentFilter.type) return false;
-        if (currentFilter.person !== 'all' && t.person !== currentFilter.person) return false;
+
+        const isIncome = (t.type.toLowerCase() === 'receita' || t.type.toLowerCase() === 'entrada');
+        if (currentFilter.type === 'Receita' && !isIncome) return false;
+        if (currentFilter.type === 'Despesa' && isIncome) return false;
+
+        if (currentFilter.person !== 'all' && t.person.toLowerCase() !== currentFilter.person.toLowerCase()) return false;
         return true;
       });
 
-      filteredList.forEach(t => { dynamicCategoryMap[t.category] = (dynamicCategoryMap[t.category] || 0) + t.amount; });
+      filteredList.forEach(t => {
+        dynamicCategoryMap[t.category] = (dynamicCategoryMap[t.category] || 0) + t.amount;
+      });
 
       const realCashBalance = totalIncome - directExpense - invoiceDueInMonth;
       document.getElementById('kpi-income').innerText = formatCurrency(totalIncome);
@@ -675,18 +751,19 @@
       const listEl = document.getElementById('transactions-list');
 
       if (filteredList.length === 0) {
-        listEl.innerHTML = `<div class="text-center py-8 text-slate-400 text-xs"><i class="ph-bold ph-receipt text-3xl mb-1 block"></i>Nenhum registro encontrado para os filtros deste mês.</div>`;
+        listEl.innerHTML = `<div class="text-center py-8 text-slate-400 text-xs"><i class="ph-bold ph-receipt text-3xl mb-1 block"></i>Nenhum registro encontrado para este mês. Toque em 🔄 no topo para atualizar da planilha.</div>`;
       } else {
         listEl.innerHTML = filteredList.map(t => {
-          const isIncome = t.type === 'Receita';
-          const isJoyce = t.person === 'Joyce';
-          const iconType = isIncome ? 'ph-arrow-down-left text-emerald-600' : (t.payment === 'Crédito' ? 'ph-credit-card text-indigo-600' : 'ph-arrow-up-right text-rose-500');
+          const isIncome = (t.type.toLowerCase() === 'receita' || t.type.toLowerCase() === 'entrada');
+          const isJoyce = t.person.toLowerCase() === 'joyce';
+          const isCredit = (t.payment.toLowerCase() === 'crédito' || t.payment.toLowerCase() === 'credito');
+          const iconType = isIncome ? 'ph-arrow-down-left text-emerald-600' : (isCredit ? 'ph-credit-card text-indigo-600' : 'ph-arrow-up-right text-rose-500');
           const badgePerson = isJoyce ? 'bg-rose-50 text-rose-600 border border-rose-100' : 'bg-sky-50 text-sky-600 border border-sky-100';
           const sign = isIncome ? '+' : '-';
-          const valColor = isIncome ? 'text-emerald-600' : (t.payment === 'Crédito' ? 'text-indigo-600' : 'text-slate-800');
+          const valColor = isIncome ? 'text-emerald-600' : (isCredit ? 'text-indigo-600' : 'text-slate-800');
 
           let invoiceNote = '';
-          if (t.payment === 'Crédito') {
+          if (isCredit) {
             const due = getInvoiceDueMonth(t.date);
             const monthsShort = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
             invoiceNote = `<span class="text-[10px] text-indigo-500 font-semibold">(Fatura ${monthsShort[due.month]})</span>`;
@@ -695,7 +772,7 @@
           return `
             <div class="p-3 bg-slate-50 hover:bg-slate-100 rounded-xl border border-slate-200 flex items-center justify-between transition">
               <div class="flex items-center space-x-3">
-                <div class="w-9 h-9 rounded-xl ${isIncome ? 'bg-emerald-100' : (t.payment === 'Crédito' ? 'bg-indigo-100' : (isJoyce ? 'bg-rose-100' : 'bg-sky-100'))} flex items-center justify-center font-bold text-xs">
+                <div class="w-9 h-9 rounded-xl ${isIncome ? 'bg-emerald-100' : (isCredit ? 'bg-indigo-100' : (isJoyce ? 'bg-rose-100' : 'bg-sky-100'))} flex items-center justify-center font-bold text-xs">
                   <i class="ph-bold ${iconType} text-base"></i>
                 </div>
                 <div>
@@ -767,7 +844,7 @@
 
     window.addEventListener('DOMContentLoaded', () => {
       renderApp();
-      if (cloudUrl) fetchFromCloud(false);
+      fetchFromCloud(false);
     });
   </script>
 </body>

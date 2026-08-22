@@ -44,7 +44,7 @@
     <!-- PAINEL PRINCIPAL -->
     <main class="flex-1 p-4 space-y-4">
       
-      <!-- SELETOR DE MÊS COM OPÇÃO DE VER TUDO -->
+      <!-- SELETOR DE MÊS -->
       <div class="bg-white rounded-2xl p-3 border border-slate-200 shadow-sm space-y-2">
         <div class="flex items-center justify-between">
           <button onclick="changeMonth(-1)" class="p-1.5 text-slate-600 hover:text-indigo-600 rounded-lg">
@@ -52,7 +52,7 @@
           </button>
           <div class="text-center">
             <span class="text-xs font-bold text-slate-800 uppercase tracking-wide" id="selected-month-label">Carregando...</span>
-            <p class="text-[10px] text-slate-400 font-medium">Fechamento do Cartão: Dia 05</p>
+            <p class="text-[10px] text-slate-400 font-medium">Fechamento do Cartão: Todo dia 05</p>
           </div>
           <button onclick="changeMonth(1)" class="p-1.5 text-slate-600 hover:text-indigo-600 rounded-lg">
             <i class="ph-bold ph-caret-right text-lg"></i>
@@ -60,7 +60,7 @@
         </div>
         
         <div class="flex justify-center border-t border-slate-100 pt-2">
-          <button onclick="toggleViewAllMonths()" id="btn-view-all" class="text-[11px] font-semibold text-indigo-600 hover:text-indigo-800 flex items-center gap-1 bg-indigo-50 px-3 py-1 rounded-full transition">
+          <button onclick="toggleViewAllMonths()" id="btn-view-all" class="text-[11px] font-bold text-indigo-600 hover:text-indigo-800 flex items-center gap-1 bg-indigo-50 px-3 py-1 rounded-full transition">
             <i class="ph-bold ph-calendar"></i> <span id="btn-view-all-text">Ver todos os meses acumulados</span>
           </button>
         </div>
@@ -71,7 +71,7 @@
         
         <div id="balance-card" class="col-span-2 bg-emerald-600 text-white rounded-2xl p-4 shadow-lg transition-colors">
           <div class="flex justify-between items-center opacity-85 text-xs font-semibold uppercase tracking-wider mb-1">
-            <span id="balance-card-title">Saldo Líquido em Conta (Caixa)</span>
+            <span>Saldo Líquido em Conta (Caixa)</span>
             <i id="balance-icon" class="ph-bold ph-trend-up text-xl"></i>
           </div>
           <div class="text-2xl font-black tracking-tight" id="kpi-balance">R$ 0,00</div>
@@ -223,7 +223,6 @@
       </div>
 
       <div class="flex-1 p-6 flex flex-col justify-center">
-        <!-- Passo 1: Quem -->
         <div id="step-1" class="wizard-step space-y-6">
           <div class="text-center">
             <span id="wizard-flow-badge" class="px-3 py-1 rounded-full text-[11px] font-bold uppercase tracking-wider bg-rose-100 text-rose-700 inline-block mb-2">Novo Gasto</span>
@@ -245,7 +244,6 @@
           </div>
         </div>
 
-        <!-- Passo 2: Data -->
         <div id="step-2" class="wizard-step hidden space-y-6">
           <div class="text-center">
             <h2 class="text-xl font-bold text-slate-800">Qual é a data?</h2>
@@ -260,7 +258,6 @@
           </div>
         </div>
 
-        <!-- Passo 3: Valor -->
         <div id="step-3" class="wizard-step hidden space-y-6">
           <div class="text-center">
             <h2 class="text-xl font-bold text-slate-800" id="step-3-title">Qual foi o valor?</h2>
@@ -279,7 +276,6 @@
           </div>
         </div>
 
-        <!-- Passo 4: Pagamento -->
         <div id="step-4" class="wizard-step hidden space-y-6">
           <div class="text-center">
             <h2 class="text-xl font-bold text-slate-800" id="step-4-title">Forma de Pagamento</h2>
@@ -310,7 +306,6 @@
           <button onclick="goToStep(3)" class="w-full py-3 rounded-xl border border-slate-300 font-semibold text-slate-600 text-sm">Voltar</button>
         </div>
 
-        <!-- Passo 5: Categoria -->
         <div id="step-5" class="wizard-step hidden space-y-5">
           <div class="text-center">
             <h2 class="text-xl font-bold text-slate-800">Selecione a Categoria</h2>
@@ -386,9 +381,8 @@
             <i class="ph ph-x text-xl"></i>
           </button>
         </div>
-        <p class="text-xs text-slate-500 leading-relaxed">Cole abaixo a URL gerada na implantação do Google Apps Script:</p>
+        <p class="text-xs text-slate-500 leading-relaxed">URL do Google Apps Script:</p>
         <div>
-          <label class="block text-[11px] font-bold text-slate-700 mb-1">URL do Web App (Google Apps Script):</label>
           <input type="url" id="input-cloud-url" placeholder="https://script.google.com/macros/s/.../exec" class="w-full text-xs p-3 rounded-xl border border-slate-300 focus:border-indigo-600 outline-none bg-slate-50" />
         </div>
         <div class="flex gap-2">
@@ -399,7 +393,7 @@
   </div>
 
   <script>
-    const STORAGE_KEY = 'joyce_rodrigo_financas_v8';
+    const STORAGE_KEY = 'joyce_rodrigo_financas_v9';
     const CONFIG_KEY = 'casal_financas_cloud_url';
     const CARD_CLOSING_DAY = 5;
 
@@ -415,13 +409,28 @@
     function formatCurrency(val) { return Number(val || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }); }
 
     /**
-     * Parse flexível para qualquer tipo de data
+     * Limpa e converte valores no padrão brasileiro "150,00" ou "R$ 1.500,00" para float
+     */
+    function parseNumericValue(val) {
+      if (typeof val === 'number') return isNaN(val) ? 0 : val;
+      if (!val) return 0;
+      let clean = String(val).replace('R$', '').replace(/\s/g, '').trim();
+      if (clean.includes(',') && clean.includes('.')) {
+        clean = clean.replace(/\./g, '').replace(',', '.');
+      } else if (clean.includes(',')) {
+        clean = clean.replace(',', '.');
+      }
+      const num = parseFloat(clean);
+      return isNaN(num) ? 0 : num;
+    }
+
+    /**
+     * Leitor tolerante de datas
      */
     function parseDateObj(dateInput) {
       if (!dateInput) return null;
       if (typeof dateInput === 'string') {
         const cleanStr = dateInput.trim();
-        // Caso YYYY-MM-DD ou ISO
         if (cleanStr.includes('-')) {
           const parts = cleanStr.split('T')[0].split('-');
           if (parts.length >= 3) {
@@ -431,7 +440,6 @@
             if (!isNaN(y) && !isNaN(m) && !isNaN(d)) return { year: y, month: m, day: d };
           }
         }
-        // Caso DD/MM/YYYY
         if (cleanStr.includes('/')) {
           const parts = cleanStr.split('/');
           if (parts.length >= 3) {
@@ -491,8 +499,6 @@
 
     function autoDetectLatestMonth() {
       if (transactions.length === 0) return;
-      
-      // Procura a data mais recente nos lançamentos
       let latestP = null;
       for (const t of transactions) {
         const p = parseDateObj(t.date);
@@ -502,7 +508,6 @@
           }
         }
       }
-
       if (latestP) {
         currentSelectedDate = new Date(latestP.year, latestP.month, 1);
       }
@@ -620,7 +625,7 @@
             type: String(item.type || 'Despesa').trim(),
             person: String(item.person || 'Joyce').trim(),
             date: String(item.date).split('T')[0],
-            amount: Number(item.amount) || 0,
+            amount: parseNumericValue(item.amount),
             payment: String(item.payment || 'Pix').trim(),
             category: String(item.category || 'Outros').trim(),
             desc: String(item.desc || '').trim()
@@ -682,10 +687,10 @@
 
       transactions.forEach(t => {
         const p = parseDateObj(t.date);
-        const matchMonth = isViewAllMonths ? true : (p && p.year === selYear && p.month === selMonth);
+        const matchMonth = isViewAllMonths ? true : (p ? (p.year === selYear && p.month === selMonth) : true);
 
-        const isIncome = (t.type.toLowerCase() === 'receita' || t.type.toLowerCase() === 'entrada');
-        const isCredit = (t.payment.toLowerCase() === 'crédito' || t.payment.toLowerCase() === 'credito');
+        const isIncome = (t.type.toLowerCase().includes('receita') || t.type.toLowerCase().includes('entrada'));
+        const isCredit = (t.payment.toLowerCase().includes('crédito') || t.payment.toLowerCase().includes('credito'));
 
         if (isIncome && matchMonth) {
           totalIncome += t.amount;
@@ -704,25 +709,25 @@
             }
             if (!isViewAllMonths && (due.year === nextYearIdx && due.month === nextMonthIdx)) {
               nextInvoiceTotal += t.amount;
-              if (t.person.toLowerCase() === 'joyce') nextInvJoyce += t.amount;
-              if (t.person.toLowerCase() === 'rodrigo') nextInvRodrigo += t.amount;
+              if (t.person.toLowerCase().includes('joyce')) nextInvJoyce += t.amount;
+              if (t.person.toLowerCase().includes('rodrigo')) nextInvRodrigo += t.amount;
             }
           }
         }
       });
 
-      // Filtragem para Lista e Gráfico
+      // Filtragem da lista
       const filteredList = transactions.filter(t => {
         const p = parseDateObj(t.date);
-        if (!isViewAllMonths) {
-          if (!p || p.year !== selYear || p.month !== selMonth) return false;
+        if (!isViewAllMonths && p) {
+          if (p.year !== selYear || p.month !== selMonth) return false;
         }
 
-        const isIncome = (t.type.toLowerCase() === 'receita' || t.type.toLowerCase() === 'entrada');
+        const isIncome = (t.type.toLowerCase().includes('receita') || t.type.toLowerCase().includes('entrada'));
         if (currentFilter.type === 'Receita' && !isIncome) return false;
         if (currentFilter.type === 'Despesa' && isIncome) return false;
 
-        if (currentFilter.person !== 'all' && t.person.toLowerCase() !== currentFilter.person.toLowerCase()) return false;
+        if (currentFilter.person !== 'all' && !t.person.toLowerCase().includes(currentFilter.person.toLowerCase())) return false;
         return true;
       });
 
@@ -759,12 +764,12 @@
       const listEl = document.getElementById('transactions-list');
 
       if (filteredList.length === 0) {
-        listEl.innerHTML = `<div class="text-center py-8 text-slate-400 text-xs"><i class="ph-bold ph-receipt text-3xl mb-1 block"></i>Nenhum registro para este mês selecionado. Toque no botão acima "Ver todos os meses acumulados" para ver tudo.</div>`;
+        listEl.innerHTML = `<div class="text-center py-8 text-slate-400 text-xs"><i class="ph-bold ph-receipt text-3xl mb-1 block"></i>Nenhum registro encontrado para este mês. Toque no botão "Ver todos os meses acumulados" acima para visualizar tudo.</div>`;
       } else {
         listEl.innerHTML = filteredList.map(t => {
-          const isIncome = (t.type.toLowerCase() === 'receita' || t.type.toLowerCase() === 'entrada');
-          const isJoyce = t.person.toLowerCase() === 'joyce';
-          const isCredit = (t.payment.toLowerCase() === 'crédito' || t.payment.toLowerCase() === 'credito');
+          const isIncome = (t.type.toLowerCase().includes('receita') || t.type.toLowerCase().includes('entrada'));
+          const isJoyce = t.person.toLowerCase().includes('joyce');
+          const isCredit = (t.payment.toLowerCase().includes('crédito') || t.payment.toLowerCase().includes('credito'));
           const iconType = isIncome ? 'ph-arrow-down-left text-emerald-600' : (isCredit ? 'ph-credit-card text-indigo-600' : 'ph-arrow-up-right text-rose-500');
           const badgePerson = isJoyce ? 'bg-rose-50 text-rose-600 border border-rose-100' : 'bg-sky-50 text-sky-600 border border-sky-100';
           const sign = isIncome ? '+' : '-';

@@ -25,8 +25,8 @@
         <div>
           <h1 class="font-bold text-base tracking-tight leading-tight">Joyce & Rodrigo</h1>
           <div class="flex items-center gap-1.5">
-            <span id="sync-status-dot" class="w-2 h-2 rounded-full bg-amber-400"></span>
-            <span id="sync-status-text" class="text-[10px] text-indigo-100 font-medium">Modo Local</span>
+            <span id="sync-status-dot" class="w-2 h-2 rounded-full bg-emerald-400"></span>
+            <span id="sync-status-text" class="text-[10px] text-indigo-100 font-medium">Nuvem Conectada</span>
           </div>
         </div>
       </div>
@@ -44,18 +44,26 @@
     <!-- PAINEL PRINCIPAL -->
     <main class="flex-1 p-4 space-y-4">
       
-      <!-- SELETOR DE MÊS -->
-      <div class="bg-white rounded-2xl p-3 border border-slate-200 shadow-sm flex items-center justify-between">
-        <button onclick="changeMonth(-1)" class="p-1.5 text-slate-600 hover:text-indigo-600 rounded-lg">
-          <i class="ph-bold ph-caret-left text-lg"></i>
-        </button>
-        <div class="text-center">
-          <span class="text-xs font-bold text-slate-800 uppercase tracking-wide" id="selected-month-label">Carregando...</span>
-          <p class="text-[10px] text-slate-400 font-medium">Fechamento do Cartão: Todo dia 05</p>
+      <!-- SELETOR DE MÊS COM OPÇÃO DE VER TUDO -->
+      <div class="bg-white rounded-2xl p-3 border border-slate-200 shadow-sm space-y-2">
+        <div class="flex items-center justify-between">
+          <button onclick="changeMonth(-1)" class="p-1.5 text-slate-600 hover:text-indigo-600 rounded-lg">
+            <i class="ph-bold ph-caret-left text-lg"></i>
+          </button>
+          <div class="text-center">
+            <span class="text-xs font-bold text-slate-800 uppercase tracking-wide" id="selected-month-label">Carregando...</span>
+            <p class="text-[10px] text-slate-400 font-medium">Fechamento do Cartão: Dia 05</p>
+          </div>
+          <button onclick="changeMonth(1)" class="p-1.5 text-slate-600 hover:text-indigo-600 rounded-lg">
+            <i class="ph-bold ph-caret-right text-lg"></i>
+          </button>
         </div>
-        <button onclick="changeMonth(1)" class="p-1.5 text-slate-600 hover:text-indigo-600 rounded-lg">
-          <i class="ph-bold ph-caret-right text-lg"></i>
-        </button>
+        
+        <div class="flex justify-center border-t border-slate-100 pt-2">
+          <button onclick="toggleViewAllMonths()" id="btn-view-all" class="text-[11px] font-semibold text-indigo-600 hover:text-indigo-800 flex items-center gap-1 bg-indigo-50 px-3 py-1 rounded-full transition">
+            <i class="ph-bold ph-calendar"></i> <span id="btn-view-all-text">Ver todos os meses acumulados</span>
+          </button>
+        </div>
       </div>
 
       <!-- CARDS DE SALDO E GASTOS -->
@@ -63,11 +71,11 @@
         
         <div id="balance-card" class="col-span-2 bg-emerald-600 text-white rounded-2xl p-4 shadow-lg transition-colors">
           <div class="flex justify-between items-center opacity-85 text-xs font-semibold uppercase tracking-wider mb-1">
-            <span>Saldo Líquido em Conta (Caixa)</span>
+            <span id="balance-card-title">Saldo Líquido em Conta (Caixa)</span>
             <i id="balance-icon" class="ph-bold ph-trend-up text-xl"></i>
           </div>
           <div class="text-2xl font-black tracking-tight" id="kpi-balance">R$ 0,00</div>
-          <div class="text-[11px] text-emerald-100 font-medium mt-1" id="kpi-balance-status">Entradas menos saídas reais do mês 🎉</div>
+          <div class="text-[11px] text-emerald-100 font-medium mt-1" id="kpi-balance-status">Entradas menos saídas reais 🎉</div>
         </div>
 
         <div class="bg-white rounded-2xl p-3.5 border border-slate-200 shadow-sm flex flex-col justify-between">
@@ -96,7 +104,7 @@
 
         <div class="bg-white rounded-2xl p-3 border border-slate-200 shadow-sm flex items-center justify-between">
           <div>
-            <div class="text-[10px] text-slate-400 font-medium">Total Comprado no Mês</div>
+            <div class="text-[10px] text-slate-400 font-medium">Total Comprado</div>
             <div class="text-xs font-bold text-slate-800" id="kpi-expense">R$ 0,00</div>
           </div>
           <div class="w-7 h-7 rounded-lg bg-rose-50 text-rose-500 flex items-center justify-center font-bold text-xs"><i class="ph-bold ph-shopping-bag"></i></div>
@@ -357,7 +365,7 @@
               <div class="w-8 h-8 rounded-lg bg-indigo-100 text-indigo-600 flex items-center justify-center text-lg"><i class="ph-bold ph-chart-line-up"></i></div>
               <span class="font-bold text-xs text-slate-800">Investimentos</span>
             </button>
-            <button onclick="finalizeTransaction('Outras Entradas')" class="col-span-2 btn-press p-3.5 rounded-xl border border-slate-200 bg-white flex items-center justify-center space-x-2 text-center">
+            <button onclick="finalizeTransaction('Outras Entradas')" class="col-span-2 btn-press p-3.5 rounded-xl border border-slate-200 bg-white flex items-center space-x-2 text-center">
               <div class="w-7 h-7 rounded-lg bg-slate-100 text-slate-600 flex items-center justify-center text-base"><i class="ph-bold ph-dots-three"></i></div>
               <span class="font-bold text-xs text-slate-800">Outros Ganhos</span>
             </button>
@@ -391,11 +399,12 @@
   </div>
 
   <script>
-    const STORAGE_KEY = 'joyce_rodrigo_financas_v7';
+    const STORAGE_KEY = 'joyce_rodrigo_financas_v8';
     const CONFIG_KEY = 'casal_financas_cloud_url';
     const CARD_CLOSING_DAY = 5;
 
     let currentSelectedDate = new Date();
+    let isViewAllMonths = false;
     let cloudUrl = localStorage.getItem(CONFIG_KEY) || 'https://script.google.com/macros/s/AKfycbxfa2KopzAig7CLB3FXxKhkFQTZoaojT8yx65JWwCuP8syrxxnX2xHp1c1XBYumkLC2kg/exec';
     let transactions = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
     let currentFilter = { type: 'all', person: 'all' };
@@ -405,22 +414,27 @@
     function saveLocal() { localStorage.setItem(STORAGE_KEY, JSON.stringify(transactions)); }
     function formatCurrency(val) { return Number(val || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }); }
 
+    /**
+     * Parse flexível para qualquer tipo de data
+     */
     function parseDateObj(dateInput) {
       if (!dateInput) return null;
       if (typeof dateInput === 'string') {
         const cleanStr = dateInput.trim();
+        // Caso YYYY-MM-DD ou ISO
         if (cleanStr.includes('-')) {
           const parts = cleanStr.split('T')[0].split('-');
-          if (parts.length === 3) {
+          if (parts.length >= 3) {
             const y = parseInt(parts[0], 10);
             const m = parseInt(parts[1], 10) - 1;
             const d = parseInt(parts[2], 10);
             if (!isNaN(y) && !isNaN(m) && !isNaN(d)) return { year: y, month: m, day: d };
           }
         }
+        // Caso DD/MM/YYYY
         if (cleanStr.includes('/')) {
           const parts = cleanStr.split('/');
-          if (parts.length === 3) {
+          if (parts.length >= 3) {
             const d = parseInt(parts[0], 10);
             const m = parseInt(parts[1], 10) - 1;
             const y = parseInt(parts[2], 10);
@@ -452,14 +466,46 @@
     }
 
     function updateMonthDisplay() {
-      const months = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
-      document.getElementById('selected-month-label').innerText = `${months[currentSelectedDate.getMonth()]} ${currentSelectedDate.getFullYear()}`;
+      if (isViewAllMonths) {
+        document.getElementById('selected-month-label').innerText = 'TODOS OS MESES';
+        document.getElementById('btn-view-all-text').innerText = 'Filtrar por mês';
+      } else {
+        const months = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
+        document.getElementById('selected-month-label').innerText = `${months[currentSelectedDate.getMonth()]} ${currentSelectedDate.getFullYear()}`;
+        document.getElementById('btn-view-all-text').innerText = 'Ver todos os meses acumulados';
+      }
     }
 
     function changeMonth(delta) {
+      isViewAllMonths = false;
       currentSelectedDate.setMonth(currentSelectedDate.getMonth() + delta);
       updateMonthDisplay();
       renderApp();
+    }
+
+    function toggleViewAllMonths() {
+      isViewAllMonths = !isViewAllMonths;
+      updateMonthDisplay();
+      renderApp();
+    }
+
+    function autoDetectLatestMonth() {
+      if (transactions.length === 0) return;
+      
+      // Procura a data mais recente nos lançamentos
+      let latestP = null;
+      for (const t of transactions) {
+        const p = parseDateObj(t.date);
+        if (p) {
+          if (!latestP || (p.year > latestP.year) || (p.year === latestP.year && p.month > latestP.month)) {
+            latestP = p;
+          }
+        }
+      }
+
+      if (latestP) {
+        currentSelectedDate = new Date(latestP.year, latestP.month, 1);
+      }
     }
 
     function openWizard(type) {
@@ -543,21 +589,8 @@
     function saveCloudConfig() {
       cloudUrl = document.getElementById('input-cloud-url').value.trim();
       localStorage.setItem(CONFIG_KEY, cloudUrl);
-      updateSyncStatus();
       closeConfigModal();
       if (cloudUrl) fetchFromCloud(true);
-    }
-
-    function updateSyncStatus() {
-      const dot = document.getElementById('sync-status-dot');
-      const text = document.getElementById('sync-status-text');
-      if (cloudUrl) {
-        dot.className = 'w-2 h-2 rounded-full bg-emerald-400 animate-pulse';
-        text.innerText = 'Nuvem Conectada';
-      } else {
-        dot.className = 'w-2 h-2 rounded-full bg-amber-400';
-        text.innerText = 'Modo Local';
-      }
     }
 
     async function syncToCloud(item) {
@@ -594,6 +627,7 @@
           }));
 
           saveLocal();
+          autoDetectLatestMonth();
           renderApp();
           if (showToast) alert(`Sucesso! ${transactions.length} lançamentos carregados da planilha.`);
         }
@@ -635,7 +669,6 @@
 
     function renderApp() {
       updateMonthDisplay();
-      updateSyncStatus();
 
       const selYear = currentSelectedDate.getFullYear();
       const selMonth = currentSelectedDate.getMonth();
@@ -649,25 +682,27 @@
 
       transactions.forEach(t => {
         const p = parseDateObj(t.date);
-        if (!p) return;
+        const matchMonth = isViewAllMonths ? true : (p && p.year === selYear && p.month === selMonth);
 
         const isIncome = (t.type.toLowerCase() === 'receita' || t.type.toLowerCase() === 'entrada');
         const isCredit = (t.payment.toLowerCase() === 'crédito' || t.payment.toLowerCase() === 'credito');
 
-        if (isIncome && p.year === selYear && p.month === selMonth) {
+        if (isIncome && matchMonth) {
           totalIncome += t.amount;
           countIncome++;
         }
 
         if (!isIncome) {
-          if (p.year === selYear && p.month === selMonth) {
+          if (matchMonth) {
             totalPurchasedInMonth += t.amount;
             if (!isCredit) directExpense += t.amount;
           }
           if (isCredit) {
             const due = getInvoiceDueMonth(t.date);
-            if (due.year === selYear && due.month === selMonth) invoiceDueInMonth += t.amount;
-            if (due.year === nextYearIdx && due.month === nextMonthIdx) {
+            if (isViewAllMonths || (due.year === selYear && due.month === selMonth)) {
+              invoiceDueInMonth += t.amount;
+            }
+            if (!isViewAllMonths && (due.year === nextYearIdx && due.month === nextMonthIdx)) {
               nextInvoiceTotal += t.amount;
               if (t.person.toLowerCase() === 'joyce') nextInvJoyce += t.amount;
               if (t.person.toLowerCase() === 'rodrigo') nextInvRodrigo += t.amount;
@@ -676,9 +711,12 @@
         }
       });
 
+      // Filtragem para Lista e Gráfico
       const filteredList = transactions.filter(t => {
         const p = parseDateObj(t.date);
-        if (!p || p.year !== selYear || p.month !== selMonth) return false;
+        if (!isViewAllMonths) {
+          if (!p || p.year !== selYear || p.month !== selMonth) return false;
+        }
 
         const isIncome = (t.type.toLowerCase() === 'receita' || t.type.toLowerCase() === 'entrada');
         if (currentFilter.type === 'Receita' && !isIncome) return false;
@@ -710,18 +748,18 @@
       if (realCashBalance >= 0) {
         balCard.className = 'col-span-2 bg-emerald-600 text-white rounded-2xl p-4 shadow-lg transition-colors';
         balIcon.className = 'ph-bold ph-trend-up text-xl';
-        balStatus.innerText = 'Saldo positivo após pagar saídas e fatura do dia 05 🎉';
+        balStatus.innerText = 'Saldo positivo 🎉';
       } else {
         balCard.className = 'col-span-2 bg-rose-600 text-white rounded-2xl p-4 shadow-lg transition-colors';
         balIcon.className = 'ph-bold ph-trend-down text-xl';
-        balStatus.innerText = 'Atenção: Saídas e fatura superaram as entradas ⚠️';
+        balStatus.innerText = 'Atenção: Saídas superaram as entradas ⚠️';
       }
 
       document.getElementById('history-badge').innerText = `${filteredList.length} itens`;
       const listEl = document.getElementById('transactions-list');
 
       if (filteredList.length === 0) {
-        listEl.innerHTML = `<div class="text-center py-8 text-slate-400 text-xs"><i class="ph-bold ph-receipt text-3xl mb-1 block"></i>Nenhum registro encontrado para este mês. Toque em 🔄 no topo para atualizar da planilha.</div>`;
+        listEl.innerHTML = `<div class="text-center py-8 text-slate-400 text-xs"><i class="ph-bold ph-receipt text-3xl mb-1 block"></i>Nenhum registro para este mês selecionado. Toque no botão acima "Ver todos os meses acumulados" para ver tudo.</div>`;
       } else {
         listEl.innerHTML = filteredList.map(t => {
           const isIncome = (t.type.toLowerCase() === 'receita' || t.type.toLowerCase() === 'entrada');
@@ -813,6 +851,7 @@
     }
 
     window.addEventListener('DOMContentLoaded', () => {
+      autoDetectLatestMonth();
       renderApp();
       fetchFromCloud(false);
     });

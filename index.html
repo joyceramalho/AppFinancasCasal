@@ -138,7 +138,7 @@
           </div>
         </div>
 
-        <!-- CARD 4: FATURA CARTÃO -->
+        <!-- CARD 4: FATURA DO CARTÃO DE CRÉDITO -->
         <div class="col-span-2 bg-gradient-to-br from-slate-900 to-indigo-950 text-white rounded-2xl p-4 shadow-md space-y-3">
           <div class="flex items-center justify-between">
             <div class="flex items-center gap-2">
@@ -147,7 +147,7 @@
               </div>
               <div>
                 <span class="text-[11px] font-bold text-indigo-200 uppercase tracking-wide block">Fatura Cartão de Crédito</span>
-                <span class="text-[10px] text-slate-400">Acumulada para pagar dia 05</span>
+                <span class="text-[10px] text-slate-400" id="next-invoice-cycle-label">Acumulada para pagar dia 05</span>
               </div>
             </div>
             <div class="text-right">
@@ -444,12 +444,12 @@
   </div>
 
   <script>
-    const STORAGE_KEY = 'joyce_rodrigo_financas_v13';
+    const STORAGE_KEY = 'joyce_rodrigo_financas_v14';
     const CONFIG_KEY = 'casal_financas_cloud_url';
     const CARD_CLOSING_DAY = 5;
 
     let currentSelectedDate = new Date();
-    let isViewAllMonths = true;
+    let isViewAllMonths = false;
     let cloudUrl = localStorage.getItem(CONFIG_KEY) || 'https://script.google.com/macros/s/AKfycbxfa2KopzAig7CLB3FXxKhkFQTZoaojT8yx65JWwCuP8syrxxnX2xHp1c1XBYumkLC2kg/exec';
     let transactions = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
     let currentFilter = { type: 'all', person: 'all', category: 'all' };
@@ -472,43 +472,63 @@
       return isNaN(num) ? 0 : num;
     }
 
+    /**
+     * Leitor robusto de datas brasileiras e internacionais
+     */
     function parseDateObj(dateInput) {
-      if (!dateInput) return null;
+      if (!dateInput) {
+        const d = new Date();
+        return { year: d.getFullYear(), month: d.getMonth(), day: d.getDate() };
+      }
+      
       if (typeof dateInput === 'string') {
         const cleanStr = dateInput.trim();
+        
+        // Padrão AAAA-MM-DD ou ISO
         if (cleanStr.includes('-')) {
           const parts = cleanStr.split('T')[0].split('-');
           if (parts.length >= 3) {
-            const y = parseInt(parts[0], 10);
-            const m = parseInt(parts[1], 10) - 1;
-            const d = parseInt(parts[2], 10);
+            let y = parseInt(parts[0], 10);
+            let m = parseInt(parts[1], 10) - 1;
+            let d = parseInt(parts[2], 10);
+            if (y < 100) y += 2000;
             if (!isNaN(y) && !isNaN(m) && !isNaN(d)) return { year: y, month: m, day: d };
           }
         }
+        
+        // Padrão DD/MM/AAAA ou DD/MM/AA
         if (cleanStr.includes('/')) {
           const parts = cleanStr.split('/');
-          if (parts.length >= 3) {
-            const d = parseInt(parts[0], 10);
-            const m = parseInt(parts[1], 10) - 1;
-            const y = parseInt(parts[2], 10);
+          if (parts.length >= 2) {
+            let d = parseInt(parts[0], 10);
+            let m = parseInt(parts[1], 10) - 1;
+            let y = parts.length >= 3 ? parseInt(parts[2], 10) : new Date().getFullYear();
+            if (y < 100) y += 2000;
             if (!isNaN(y) && !isNaN(m) && !isNaN(d)) return { year: y, month: m, day: d };
           }
         }
       }
+      
       const d = new Date(dateInput);
-      if (!isNaN(d.getTime())) return { year: d.getFullYear(), month: d.getMonth(), day: d.getDate() };
-      return null;
+      if (!isNaN(d.getTime())) {
+        return { year: d.getFullYear(), month: d.getMonth(), day: d.getDate() };
+      }
+      
+      const now = new Date();
+      return { year: now.getFullYear(), month: now.getMonth(), day: now.getDate() };
     }
 
     function formatDateDisplay(dateInput) {
       const p = parseDateObj(dateInput);
-      if (!p) return String(dateInput || '');
       return `${String(p.day).padStart(2, '0')}/${String(p.month + 1).padStart(2, '0')}/${p.year}`;
     }
 
+    /**
+     * Se compra até dia 5: fatura do próprio mês da compra.
+     * Se compra após dia 5: fatura do mês seguinte da compra.
+     */
     function getInvoiceDueMonth(dateInput) {
       const p = parseDateObj(dateInput);
-      if (!p) return { year: 1970, month: 0 };
       if (p.day <= CARD_CLOSING_DAY) {
         return { year: p.year, month: p.month };
       } else {
@@ -521,7 +541,7 @@
     function updateMonthDisplay() {
       if (isViewAllMonths) {
         document.getElementById('selected-month-label').innerText = 'TODOS OS MESES';
-        document.getElementById('btn-view-all-text').innerText = 'Filtrar por mês atual';
+        document.getElementById('btn-view-all-text').innerText = 'Filtrar por mês';
       } else {
         const months = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
         document.getElementById('selected-month-label').innerText = `${months[currentSelectedDate.getMonth()]} ${currentSelectedDate.getFullYear()}`;
@@ -675,7 +695,7 @@
     function setFilter(filterType, val) {
       if (filterType === 'type') {
         currentFilter.type = val;
-        currentFilter.category = 'all'; // Reseta categoria ao trocar tipo
+        currentFilter.category = 'all';
         ['all', 'Despesa', 'Receita'].forEach(t => {
           const b = document.getElementById(`filter-type-${t}`);
           b.className = t === val ? 'filter-type-btn flex-1 py-1.5 text-xs font-semibold rounded-xl border border-indigo-600 bg-indigo-600 text-white transition' : 'filter-type-btn flex-1 py-1.5 text-xs font-semibold rounded-xl border border-slate-200 bg-slate-50 text-slate-700 transition';
@@ -720,7 +740,6 @@
       let totalIncome = 0, incomeJoyce = 0, incomeRodrigo = 0, countIncome = 0;
       let directExpense = 0, directJoyce = 0, directRodrigo = 0, countDirect = 0;
       let nextInvoiceTotal = 0, nextInvJoyce = 0, nextInvRodrigo = 0;
-      let totalPurchasedInMonth = 0;
       
       const dynamicCategoryMap = {};
       const allAvailableCategories = new Set();
@@ -729,20 +748,20 @@
 
       transactions.forEach(t => {
         const p = parseDateObj(t.date);
-        const matchMonth = isViewAllMonths ? true : (p ? (p.year === selYear && p.month === selMonth) : true);
+        const matchMonth = isViewAllMonths ? true : (p.year === selYear && p.month === selMonth);
 
         const isIncome = (t.type.toLowerCase().includes('receita') || t.type.toLowerCase().includes('entrada'));
         const isCredit = (t.payment.toLowerCase().includes('crédito') || t.payment.toLowerCase().includes('credito'));
         const isJoyce = t.person.toLowerCase().includes('joyce');
 
-        // Coleta categorias para o dropdown de filtro
+        // Categorias disponíveis no mês
         if (matchMonth) {
           if (currentFilter.type === 'Receita' && isIncome) allAvailableCategories.add(t.category || 'Outros');
           else if (currentFilter.type === 'Despesa' && !isIncome) allAvailableCategories.add(t.category || 'Outros');
           else if (currentFilter.type === 'all') allAvailableCategories.add(t.category || 'Outros');
         }
 
-        // 1. ENTRADAS
+        // 1. Entradas
         if (isIncome && matchMonth) {
           totalIncome += t.amount;
           countIncome++;
@@ -750,18 +769,15 @@
           else incomeRodrigo += t.amount;
         }
 
-        // 2. SAÍDAS À VISTA
-        if (!isIncome && matchMonth) {
-          totalPurchasedInMonth += t.amount;
-          if (!isCredit) {
-            directExpense += t.amount;
-            countDirect++;
-            if (isJoyce) directJoyce += t.amount;
-            else directRodrigo += t.amount;
-          }
+        // 2. Saídas à Vista (Pix, Débito, Dinheiro)
+        if (!isIncome && matchMonth && !isCredit) {
+          directExpense += t.amount;
+          countDirect++;
+          if (isJoyce) directJoyce += t.amount;
+          else directRodrigo += t.amount;
         }
 
-        // 3. FATURA DO CARTÃO
+        // 3. Fatura Acumulada no Cartão
         if (!isIncome && isCredit) {
           const due = getInvoiceDueMonth(t.date);
           if (isViewAllMonths) {
@@ -778,7 +794,7 @@
         }
       });
 
-      // Atualiza opções do dropdown de categoria
+      // Atualiza o select de categoria
       const catSelect = document.getElementById('filter-category-select');
       const currentVal = currentFilter.category;
       catSelect.innerHTML = '<option value="all">Todas as categorias</option>' + 
@@ -790,7 +806,7 @@
         currentFilter.category = 'all';
       }
 
-      // CARDS FIXOS
+      // Saldos Líquidos
       const realCashBalance = totalIncome - directExpense;
       const balanceJoyce = incomeJoyce - directJoyce;
       const balanceRodrigo = incomeRodrigo - directRodrigo;
@@ -827,11 +843,11 @@
         balStatus.innerText = 'Atenção: Saídas superaram as entradas ⚠️';
       }
 
-      // FILTRAGEM DINÂMICA (TIPO + PESSOA + CATEGORIA ESPECÍFICA)
+      // Filtragem dinâmica para o Gráfico e Histórico
       let filterTotalAmount = 0;
       const filteredList = transactions.filter(t => {
         const p = parseDateObj(t.date);
-        if (!isViewAllMonths && p) {
+        if (!isViewAllMonths) {
           if (p.year !== selYear || p.month !== selMonth) return false;
         }
 
@@ -840,8 +856,6 @@
         if (currentFilter.type === 'Despesa' && isIncome) return false;
 
         if (currentFilter.person !== 'all' && !t.person.toLowerCase().includes(currentFilter.person.toLowerCase())) return false;
-        
-        // Filtro estrito de Categoria
         if (currentFilter.category !== 'all' && (t.category || 'Outros').toLowerCase() !== currentFilter.category.toLowerCase()) return false;
 
         return true;
@@ -853,9 +867,7 @@
         filterTotalAmount += t.amount;
       });
 
-      // ATUALIZAÇÃO DO TOTAL DINÂMICO NO TOPO DO GRÁFICO
       document.getElementById('chart-filter-total').innerText = formatCurrency(filterTotalAmount);
-      
       const chartLabel = document.getElementById('chart-filter-label');
       if (currentFilter.category !== 'all') {
         chartLabel.innerText = `Total: ${currentFilter.category}`;
@@ -867,7 +879,7 @@
       const listEl = document.getElementById('transactions-list');
 
       if (filteredList.length === 0) {
-        listEl.innerHTML = `<div class="text-center py-8 text-slate-400 text-xs"><i class="ph-bold ph-receipt text-3xl mb-1 block"></i>Nenhum registro encontrado para este filtro.</div>`;
+        listEl.innerHTML = `<div class="text-center py-8 text-slate-400 text-xs"><i class="ph-bold ph-receipt text-3xl mb-1 block"></i>Nenhum registro encontrado para os filtros selecionados.</div>`;
       } else {
         listEl.innerHTML = filteredList.map(t => {
           const isIncome = (t.type.toLowerCase().includes('receita') || t.type.toLowerCase().includes('entrada'));
@@ -956,7 +968,6 @@
             if (elements && elements.length > 0) {
               const clickedIndex = elements[0].index;
               const selectedCategory = labels[clickedIndex];
-              // Alterna seleção da categoria ao clicar na fatia
               if (currentFilter.category === selectedCategory) {
                 setCategoryFilter('all');
               } else {
